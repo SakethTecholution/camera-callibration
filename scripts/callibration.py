@@ -42,15 +42,18 @@ solver = OpenCVSolver(type='AX=YB')
 # Lists to store samples
 A_samples = []
 B_samples = []
-output_folder = "output_imgs"
+
+
+
 
 def getHandPose():
+    """Get robot pose and convert it to a homogeneous matrix."""
     robot_pose_vec = robot.get_current_pose()
     print("Raw Robot Pose:", robot_pose_vec)
     x = robot_pose_vec['X'] / 1000  # Convert to meters
     y = robot_pose_vec['Y'] / 1000
     z = robot_pose_vec['Z'] / 1000
-    # Getting rotation matrix from euler angles
+    # Getting rotation matrix from ros service call 
     R_matrix = robot.get_current_rotm()
     print("Rotation Matrix:\n", R_matrix)
     t = np.array([[x], [y], [z]])
@@ -85,6 +88,9 @@ def get_tag_3d_pose(tag_info):
     return None
 
 def save_sample():
+    """
+    Save the current sample to the sample lists in a  CSV file.
+    """
     A, robot_pose_vec = getHandPose()
     A_samples.append(A)
     B_samples.append(B)
@@ -152,6 +158,7 @@ def solve_calibration():
     print(result)
     
 def solve_calibration_csv():
+    """ This can be used when with a stored data file """
     A = []
     B = []
     
@@ -193,6 +200,8 @@ while True:
     camera.grab_frames()
     color_frame = camera.color_frame
 
+
+
     # Process frame with AprilTag tracker
     info = tag_tracker.getPoseAndCorners(color_frame, tag_id=0)
     
@@ -227,3 +236,10 @@ while True:
 cv2.destroyAllWindows()
 camera.close()
 
+# Developer Notes:
+"""
+TODO:
+1. Add saving in pickle format 
+2. Replay observations for automatic callibration 
+3. Add reprojection error for better accuracy
+"""
