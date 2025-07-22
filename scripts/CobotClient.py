@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-ip = "0.0.0.0"  # Server IP 
+ip = "192.168.1.102"  # Server IP 
 port = "8001"
 timeout = 15  # Timeout in seconds
 
@@ -92,9 +92,8 @@ class CobotClient:
     def get_current_rotm(self):
         url = f"{self.base_url}/get_current_rotm"
         response = self.make_request('get', url)
-        if response:
-            matrix = response.get('R', [])
-            return np.array(matrix)
+        if response and 'rot_matrix' in response:
+            return np.array(response['rot_matrix'])
         return None
 
     def set_tcp_values(self, x, y, z, a, b, c, name):
@@ -133,6 +132,10 @@ if __name__ == "__main__":
     # print(client.get_current_joint_values())
     # print(client.get_current_rotm())
     print(client.set_tcp_values(0, 0, 0, 0, 0, 0, "tcp1"))
+    print(client.get_current_pose())
+    rotm = client.get_current_rotm()
+    print("Rotation Matrix:", rotm)
+    print("here")
     # print(client.get_current_pose())
     # print(client.move_to_joints([90, 0, 90, 0, 90, 0]))
     # print(client.set_gripper_status(value=0))
